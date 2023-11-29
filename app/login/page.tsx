@@ -1,3 +1,5 @@
+"use client";
+
 import FacebookIcon from "@/components/base/svg/FacebookIcon";
 import GithubIcon from "@/components/base/svg/GithubIcon";
 import GoogleIcon from "@/components/base/svg/GoogleIcon";
@@ -9,8 +11,13 @@ import {
   TextField,
 } from "@mui/material";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const router = useRouter();
+  const login = () => {
+    router.replace("/");
+  };
   return (
     <div
       className="h-screen relative bg-[url('/img/login-bg.jpeg')] bg-no-repeat bg-center bg-cover before:content-['']
@@ -49,6 +56,7 @@ const Login = () => {
           <Button
             fullWidth
             variant="contained"
+            onClick={login}
             className="h-10 rounded-lg bg-[linear-gradient(195deg,rgb(73,163,241),rgb(26,115,232))]"
           >
             SIGN IN
