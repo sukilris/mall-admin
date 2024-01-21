@@ -3,21 +3,26 @@
 import FacebookIcon from "@/components/base/svg/FacebookIcon";
 import GithubIcon from "@/components/base/svg/GithubIcon";
 import GoogleIcon from "@/components/base/svg/GoogleIcon";
-import {
-  Button,
-  IconButton,
-  OutlinedInput,
-  Switch,
-  TextField,
-} from "@mui/material";
+import { Button, IconButton, Switch, TextField } from "@mui/material";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { useKeyPress } from "ahooks";
+import { login } from "@/http/user";
 
 const Login = () => {
   const router = useRouter();
-  const login = () => {
-    router.replace("/");
-  };
+  const { register, formState, handleSubmit } = useForm<User.UserLoginReqDto>();
+  const emailField = register("email", { required: true });
+  const passwordField = register("password", { required: true });
+  console.log(formState);
+  const loginHandle = handleSubmit(async (data) => {
+    console.log(data);
+    const res = await login({});
+    console.log(res);
+    // router.replace("/");
+  });
+  useKeyPress("enter", () => loginHandle());
   return (
     <div
       className="h-screen relative bg-[url('/img/login-bg.jpeg')] bg-no-repeat bg-center bg-cover before:content-['']
@@ -45,8 +50,21 @@ const Login = () => {
           </div>
         </div>
         <div className="mt-10 px-6">
-          <TextField label="Email" fullWidth size="small" />
-          <TextField label="password" fullWidth size="small" className="mt-4" />
+          <TextField
+            label="Email"
+            variant="outlined"
+            fullWidth
+            size="small"
+            {...emailField}
+          />
+          <TextField
+            label="password"
+            variant="outlined"
+            fullWidth
+            size="small"
+            className="mt-4"
+            {...passwordField}
+          />
           <div className="h-10 mt-6 mb-8">
             <label className="cursor-pointer">
               <Switch />
@@ -56,7 +74,7 @@ const Login = () => {
           <Button
             fullWidth
             variant="contained"
-            onClick={login}
+            onClick={loginHandle}
             className="h-10 rounded-lg bg-[linear-gradient(195deg,rgb(73,163,241),rgb(26,115,232))]"
           >
             SIGN IN

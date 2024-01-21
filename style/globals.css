@@ -8,6 +8,43 @@
   }
 }
 
+:root {
+  --colors-sky: #0ea5e9;
+  --colors-green: #1db847;
+  --colors-red: #fa423c;
+  --colors-purple: #5f5afa;
+  --colors-pink: #ff5ca0;
+  --colors-orange: #ff801f;
+  --colors-yellow: #ffd014;
+  --colors-accent: #fff;
+  --colors-lightBlue: #eff4fe;
+  --colors-label: #000;
+  --colors-labelWhite: #fff;
+
+  --colors-dark-blue: #3898ff;
+  --colors-dark-green: #4bd166;
+  --colors-dark-red: #ff6257;
+  --colors-dark-purple: #7a70ff;
+  --colors-dark-pink: #ff7ab8;
+  --colors-dark-orange: #ff983d;
+  --colors-dark-yellow: #ffdf3d;
+  --colors-dark-label: #fff;
+  --colors-dark-labelWhite: #fff;
+  --colors-dark-lightBlue: #252c39;
+}
+
+::selection {
+  background-color: var(--selectionColor);
+  color: var(--colors-labelWhite);
+  -webkit-text-fill-color: var(--colors-labelWhite);
+}
+
+::-moz-selection {
+  background-color: var(--selectionColor);
+  color: var(--colors-labelWhite);
+  -webkit-text-fill-color: var(--colors-labelWhite);
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

@@ -7,6 +7,7 @@ import ThemeStore from "@/store/ThemeStore";
 import { createContext, useContext, useMemo, useState } from "react";
 import Copyright from "./_components/Copyright";
 import { usePathname } from "next/navigation";
+import useRandomSelectionColor from "@/hooks/useRandomSelectionColor";
 
 type LayoutContext = {
   sideBarOpen: boolean;
@@ -39,6 +40,7 @@ export default function RootLayout({
     }),
     [sideBarOpen]
   );
+  useRandomSelectionColor();
   const renderChildren = () => {
     if (excludePath.includes(pathname)) {
       return children;
