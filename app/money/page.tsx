@@ -2,10 +2,41 @@
 
 import { Button } from "@mui/material";
 import html2canvas from "html2canvas";
-import { useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Rubik, Noto_Sans } from "next/font/google";
+import dayjs, { Dayjs } from "dayjs";
+
+const rubik = Rubik({
+  subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+});
 
 const Money = () => {
   const container = useRef<HTMLDivElement | null>(null);
+  const [data, setData] = useState<{ date: Dayjs; money: number }[]>([]);
+  const sum = useMemo(
+    () =>
+      Math.round(
+        data.reduce((sum, item) => sum + Number(item.money.toFixed(2)), 0)
+      ),
+    [data]
+  );
+  console.log(sum);
+  const createData = (start: Dayjs, end: Dayjs) => {
+    return Array.from({ length: end.diff(start, "day") }).map((_, i) => {
+      return {
+        date: dayjs(
+          Math.round(
+            end.subtract(i, "day").valueOf() +
+              63000000 +
+              Math.random() * 5400000
+          )
+        ),
+        money: Math.random() * 2 + 34,
+      };
+    });
+  };
   const createImage = () => {
     html2canvas(container.current!, { useCORS: true }).then((canvas) => {
       const dataURL = canvas.toDataURL("image/jpeg");
@@ -22,34 +53,41 @@ const Money = () => {
       const dataURL = canvas.toDataURL("image/jpeg");
     });
   };
+  useEffect(() => {
+    setData(
+      createData(
+        dayjs("2023-02-20", "YYYY-MM-DD"),
+        dayjs("2023-03-05", "YYYY-MM-DD")
+      )
+    );
+  }, []);
   return (
     <div className="h-screen flex items-stretch">
       <div className="flex-1 shrink-0">
         <Button onClick={createImage}>生成图片</Button>
         <Button onClick={preview}>预览</Button>
       </div>
-      <div className="flex-1 shrink-0 h-full overflow-y-auto">
+      <div
+        className={`flex-1 shrink-0 h-full flex items-center justify-center ${rubik.className}`}
+      >
         <div
           ref={container}
-          className="w-[1080px] scale-[0.4] origin-top-left bg-[#efefef] font-[微软雅黑]"
+          className="w-[430px] h-[932px] overflow-y-auto bg-[#efefef]"
         >
-          <div className="h-[152px] flex items-center justify-between px-[45px]">
-            <span className="text-[#131313] text-[45px]">2024年2月</span>
-            <span className="text-[#b9b9b9] text-[34px]">支出￥676.76</span>
+          <div className="h-[68px] flex items-center justify-between px-[18px]">
+            <span className="text-[#131313] text-base">2024年2月</span>
+            <span className="text-[#b9b9b9] text-xs">支出￥{sum}</span>
           </div>
-          {[1, 1, 1, 1, 1, 1, 1].map((_, i) => (
-            <div
-              key={i}
-              className="flex items-stretch h-[217px] pl-[45px] bg-white"
-            >
+          {data.map(({ date, money }, i) => (
+            <div key={i} className="flex items-stretch h-24 pl-[18px] bg-white">
               <div className="flex items-center">
                 <svg
                   viewBox="0 0 1024 1024"
                   version="1.1"
                   xmlns="http://www.w3.org/2000/svg"
                   p-id="4801"
-                  width="132"
-                  height="132"
+                  width="56"
+                  height="56"
                 >
                   <path
                     d="M32 512c0 265.088 214.912 480 480 480 265.088 0 480-214.912 480-480 0-265.088-214.912-480-480-480C246.912 32 32 246.912 32 512z"
@@ -68,17 +106,17 @@ const Money = () => {
                   ></path>
                 </svg>
               </div>
-              <div className="flex-1 flex flex-col justify-center ml-[45px] pr-[45px] border-0 border-b-[2px] border-solid border-[#f7f7f7]">
+              <div className="flex-1 flex flex-col justify-center ml-[18px] pr-[18px] border-0 border-b-[2px] border-solid border-[#f7f7f7]">
                 <div className="flex items-center justify-between">
-                  <span className="text-[#1a1a1a] text-[43px]">
+                  <span className={`text-[#1a1a1a] text-base font-semibold`}>
                     美团平台商户
                   </span>
-                  <span className="text-[#1a1a1a] text-[33px] font-semibold">
-                    -298.00
+                  <span className="text-[#1a1a1a] text-[15px] font-semibold">
+                    -{money.toFixed(2)}
                   </span>
                 </div>
-                <span className="text-[#b1b1b1] text-[33px] mt-3">
-                  2月26日 19:39
+                <span className="text-[#b1b1b1] text-[15px] mt-1">
+                  {date.format("M月D日 HH:mm")}
                 </span>
               </div>
             </div>
