@@ -21,7 +21,7 @@ export const LayoutContext = createContext<LayoutContext>({
   toggleSideBarOpen: noop,
 });
 
-const excludePath = ["/login"];
+const excludePath = ["/login", "/money"];
 
 export default function RootLayout({
   children,
