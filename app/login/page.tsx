@@ -5,24 +5,37 @@ import GithubIcon from "@/components/base/svg/GithubIcon";
 import GoogleIcon from "@/components/base/svg/GoogleIcon";
 import { Button, IconButton, Switch, TextField } from "@mui/material";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { useKeyPress } from "ahooks";
-import { login } from "@/http/user";
+import { useState } from "react";
+import Login from "./_components/login";
+import Signup from "./_components/signup";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
-const Login = () => {
-  const router = useRouter();
-  const { register, formState, handleSubmit } = useForm<User.UserLoginReqDto>();
-  const emailField = register("email", { required: true });
-  const passwordField = register("password", { required: true });
-  console.log(formState);
-  const loginHandle = handleSubmit(async (data) => {
-    console.log(data);
-    const res = await login({});
-    console.log(res);
-    // router.replace("/");
+enum AuthType {
+  Login,
+  Signup,
+}
+
+const AuthPage = () => {
+  const [authType, setAuthType] = useState(AuthType.Login);
+  const [parentRef] = useAutoAnimate((el, action) => {
+    let keyframes: Keyframe[] = [];
+    if (action === "add") {
+      keyframes = [
+        { transform: "translateX(100%)" },
+        { transform: "translateX(0)", opacity: 1 },
+      ];
+    }
+    if (action === "remove") {
+      keyframes = [
+        { transform: "translateX(0)", opacity: 1 },
+        { transform: "translateX(-100%)" },
+      ];
+    }
+    return new KeyframeEffect(el, keyframes, {
+      duration: 300,
+      easing: "ease-in-out",
+    });
   });
-  useKeyPress("enter", () => loginHandle());
   return (
     <div
       className="h-screen relative bg-[url('/img/login-bg.jpeg')] bg-no-repeat bg-center bg-cover before:content-['']
@@ -32,59 +45,13 @@ const Login = () => {
             before:bg-[linear-gradient(195deg,rgba(66,66,74,0.6),rgba(25,25,25,0.6))]
             flex items-center justify-center"
     >
-      <div className="lg:w-[25%] bg-white rounded-xl z-10">
-        <div className="px-4">
-          <div className="h-[153px] relative -top-6 flex flex-col items-center justify-center rounded-lg bg-[linear-gradient(195deg,rgb(73,163,241),rgb(26,115,232))] shadow-[rgba(0,0,0,0.14)_0rem_0.25rem_1.25rem_0rem,rgba(0,187,212,0.4)_0rem_0.4375rem_0.625rem_-0.3125rem]">
-            <span className="text-2xl font-semibold text-white">Sign in</span>
-            <div className="flex gap-14 mt-6">
-              <IconButton className="text-white">
-                <FacebookIcon />
-              </IconButton>
-              <IconButton className="text-white">
-                <GithubIcon className="w-5 h-5" />
-              </IconButton>
-              <IconButton className="text-white">
-                <GoogleIcon />
-              </IconButton>
-            </div>
-          </div>
-        </div>
-        <div className="mt-10 px-6">
-          <TextField
-            label="Email"
-            variant="outlined"
-            fullWidth
-            size="small"
-            {...emailField}
-          />
-          <TextField
-            label="password"
-            variant="outlined"
-            fullWidth
-            size="small"
-            className="mt-4"
-            {...passwordField}
-          />
-          <div className="h-10 mt-6 mb-8">
-            <label className="cursor-pointer">
-              <Switch />
-              <span className="text-[rgb(123,128,154)]">Remember me</span>
-            </label>
-          </div>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={loginHandle}
-            className="h-10 rounded-lg bg-[linear-gradient(195deg,rgb(73,163,241),rgb(26,115,232))]"
-          >
-            SIGN IN
-          </Button>
-          <div className="py-10 text-center text-[rgb(123,128,154)]">
-            Don't have an account?{" "}
-            <Button className="px-0 min-w-0 normal-case font-semibold">
-              Sign up
-            </Button>
-          </div>
+      <div className="lg:w-[25%] pt-6 overflow-hidden">
+        <div ref={parentRef} className="bg-white rounded-xl z-10">
+          {authType === AuthType.Login ? (
+            <Login toSignup={() => setAuthType(AuthType.Signup)} />
+          ) : (
+            <Signup toLogin={() => setAuthType(AuthType.Login)} />
+          )}
         </div>
       </div>
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
@@ -98,4 +65,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AuthPage;
