@@ -1,11 +1,17 @@
 "use client";
 
-import { Button, Dialog } from "@mui/material";
+import { Button, Dialog, TextField } from "@mui/material";
 import html2canvas from "html2canvas";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Rubik, Noto_Sans } from "next/font/google";
 import dayjs, { Dayjs } from "dayjs";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import DateRangePicker from "@/components/base/DateRangePicker";
+
+enum Shop {
+  QianHai,
+  Meituan,
+}
 
 const rubik = Rubik({
   subsets: ["latin"],
@@ -13,59 +19,35 @@ const rubik = Rubik({
   weight: "400",
 });
 
-const data = [
-  {
-    month: "2024年2月",
-    sum: "676.76",
-    days: [
-      {
-        time: "2月5日 18:05",
-        num: "-37.59",
-      },
-      {
-        time: "2月4日 17:33",
-        num: "-298.00",
-      },
-      {
-        time: "2月4日 17:33",
-        num: "-298.00",
-        refound: true,
-      },
-      {
-        time: "2月3日 18:16",
-        num: "-35.37",
-        originPrice: "35.5",
-      },
-      {
-        time: "2月2日 18:12",
-        num: "-36.70",
-        originPrice: "37.0",
-      },
-      {
-        time: "2月1日 17:55",
-        num: "-35.70",
-      },
-    ],
-  },
-  {
-    month: "2024年1月",
-    sum: "1643.18",
-    days: [
-      {
-        time: "1月31日 18:06",
-        num: "-33.39",
-      },
-      {
-        time: "1月30日 17:54",
-        num: "-36.03",
-      },
-    ],
-  },
-];
+type Data = {
+  month: string;
+  sum: string;
+  days: {
+    shop: Shop;
+    time: string;
+    num: string;
+    originPrice?: string;
+    refound?: boolean;
+    isWeekend: boolean;
+    disable?: boolean;
+  }[];
+};
 
 const Money = () => {
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [dateRange, setDateRange] = useState<Dayjs[]>([]);
   const container = useRef<HTMLDivElement | null>(null);
+  const [shop, setShop] = useState(Shop.Meituan);
   const [dataURL, setDataURL] = useState("");
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState<Data[]>([]);
+  const filteredData = useMemo(() => {
+    return data
+      .map((item) => {
+        return { ...item, days: item.days.filter((item) => !item.disable) };
+      })
+      .filter((item) => !!item.days.length);
+  }, [data]);
   const createImage = () => {
     html2canvas(container.current!, { useCORS: true }).then((canvas) => {
       const dataURL = canvas.toDataURL("image/png");
@@ -84,89 +66,350 @@ const Money = () => {
       setOpen(true);
     });
   };
-  const [open, setOpen] = useState(false);
+  const generateData = () => {
+    if (dateRange.length === 0) return;
+    const [start, end] = dateRange;
+    const monthMap: Record<string, Data> = {};
+    let current = end;
+    while (
+      current.month() > start.month() ||
+      (current.month() === start.month() && current.date() >= start.date())
+    ) {
+      const month = current.month() + 1;
+      if (!monthMap[month]) {
+        monthMap[month] = {
+          month: `${current.year()}年${month}月`,
+          sum: "0",
+          days: [],
+        };
+      }
+      const days = monthMap[month].days;
+      days.push({
+        shop,
+        time: dayjs(
+          current.hour(17).minute(30).second(0).millisecond(0).valueOf() +
+            Math.trunc(Math.random() * 2580000)
+        ).format(`MM月DD日 HH:mm`),
+        num: String((-(33 + Math.random() * 5)).toFixed(2)),
+        isWeekend: current.day() === 0 || current.day() === 6,
+      });
+      days.push({
+        shop,
+        time: dayjs(
+          current
+            .hour(11)
+            .minute(shop === Shop.Meituan ? 20 : 30)
+            .second(0)
+            .millisecond(0)
+            .valueOf() + Math.trunc(Math.random() * 2580000)
+        ).format(`MM月DD日 HH:mm`),
+        num: String((-(33 + Math.random() * 5)).toFixed(2)),
+        isWeekend: current.day() === 0 || current.day() === 6,
+      });
+      current = current.subtract(1, "day");
+    }
+    const data = Object.keys(monthMap)
+      .sort((a, b) => Number(b) - Number(a))
+      .map((k) => monthMap[k])
+      .map((item) => {
+        item.sum = Math.abs(
+          item.days.reduce((sum, { num }) => sum + Number(num), 0)
+        ).toFixed(2);
+        return item;
+      });
+    setData(data);
+  };
+  const onDateChange = (dateRange: Dayjs[]) => {
+    setDateRange(dateRange);
+  };
+  const toggleShop = () => {
+    setShop(shop === Shop.Meituan ? Shop.QianHai : Shop.Meituan);
+  };
+  const filterDataItem = (i: number, j: number) => {
+    const newData = data.map((item, ii) => {
+      return ii === i
+        ? {
+            ...item,
+            days: item.days.map((item, jj) => {
+              return jj === j ? { ...item, disable: !item.disable } : item;
+            }),
+          }
+        : item;
+    });
+    newData.forEach((item) => {
+      item.sum = Math.abs(
+        item.days.reduce(
+          (sum, { num, disable }) => sum + (disable ? 0 : Number(num)),
+          0
+        )
+      ).toFixed(2);
+    });
+    setData(newData);
+  };
   return (
     <>
       <Dialog onClose={() => setOpen(false)} open={open}>
         <img src={dataURL} />
       </Dialog>
-      <div>
-        <Button onClick={createImage}>生成图片</Button>
-        <Button onClick={preview}>预览</Button>
-      </div>
-      <div className={rubik.className}>
-        <div className="w-[390px] h-[844px] overflow-y-auto">
-          <div className="bg-[#efefef]" ref={container}>
-            {data.map(({ month, sum, days }, i) => (
-              <div key={i}>
-                <div className="h-[60px] flex items-center justify-between px-[18px] border-0 border-y border-solid border-[#e5e5e5]">
-                  <div className="flex items-center">
-                    <span className="text-[#131313] text-base">{month}</span>
-                    <KeyboardArrowDownIcon className="text-[#131313]" />
-                  </div>
-                  <span className="text-[#b9b9b9] text-[15px]">
-                    支出￥{sum}
-                  </span>
-                </div>
-                {days.map(({ time, num, refound, originPrice }, i) => (
-                  <div
-                    key={i}
-                    className="flex items-stretch h-[85px] pl-[18px] bg-white group"
-                  >
-                    <div className="flex items-center">
-                      <svg
-                        viewBox="0 0 1024 1024"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        p-id="4801"
-                        width="56"
-                        height="56"
-                      >
-                        <path
-                          d="M32 512c0 265.088 214.912 480 480 480 265.088 0 480-214.912 480-480 0-265.088-214.912-480-480-480C246.912 32 32 246.912 32 512z"
-                          fill="#FFD306"
-                          p-id="4802"
-                        ></path>
-                        <path
-                          d="M436.224 334.4h-38.592c-7.008 20.8-9.408 29.12-9.408 29.12H237.984s-2.24-8.32-9.376-29.12H190.048v29.12H144v34.88H291.2v28.8H151.328v37.44H291.2v26.432H151.328v37.536H291.2v27.008H144v36.896H277.44s-37.568 48.128-135.008 52.576v39.296s105.824 10.304 170.752-74.24c0 0 44.224 72.736 169.024 74.368v-40.864s-83.808 2.56-132.352-51.2h132.352V555.52h-145.984v-26.944h138.976v-37.536h-139.04v-26.4h138.976V427.2h-138.976v-28.8h146.048v-34.752h-46.08l0.064-29.12v-0.096z m179.584 284.096h44.928a469.632 469.632 0 0 0 47.68-150.656h39.04v94.72c-0.64 18.848-2.72 37.696-6.208 56.192h41.408c3.104-18.56 4.704-37.376 4.8-56.224v-94.624h26.944v-36.608h-26.88v-30.4h-39.904v30.592H603.2v36.48h63.072a399.776 399.776 0 0 1-50.4 150.4v0.064l-0.064 0.064z"
-                          fill="#2C2C2C"
-                          p-id="4803"
-                        ></path>
-                        <path
-                          d="M540.8 344v345.6h291.424a49.44 49.44 0 0 0 49.376-49.504V344H540.8z m302.816 296.096a12 12 0 0 1-11.936 12.064h-253.312v-271.136h265.184v259.072h0.064z"
-                          fill="#2C2C2C"
-                          p-id="4804"
-                        ></path>
-                      </svg>
-                    </div>
-                    <div className="flex-1 flex flex-col justify-center ml-[18px] pr-[18px] border-0 border-b group-last:border-b-0 border-solid border-[#e4e4e4]">
-                      <div className="flex items-center justify-between">
-                        <span className={`text-[#1a1a1a] text-base`}>
-                          美团平台商户
+      <DateRangePicker
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+        onChange={onDateChange}
+      />
+      <div
+        className={`flex justify-center gap-x-8 h-screen overflow-hidden ${rubik.className}`}
+      >
+        <div className="w-[300px]">
+          <h3>功能</h3>
+          <div className="flex flex-col gap-y-4">
+            <span>日期范围：</span>
+            <span>
+              {dateRange.length
+                ? `${dateRange[0].format("YYYY-MM-DD")} ~ ${dateRange[1].format(
+                    "YYYY-MM-DD"
+                  )}`
+                : ""}
+            </span>
+            <Button
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              color="primary"
+              variant="contained"
+            >
+              选择日期
+            </Button>
+            <Button onClick={toggleShop} color="secondary" variant="contained">
+              前海/美团
+            </Button>
+            <Button onClick={generateData} color="primary" variant="contained">
+              生成数据
+            </Button>
+            <Button onClick={preview} color="info" variant="contained">
+              预览
+            </Button>
+            <Button onClick={createImage} color="success" variant="contained">
+              生成图片
+            </Button>
+          </div>
+        </div>
+        <div>
+          <div>
+            <h3>编辑: {shop === Shop.Meituan ? "美团" : "前海大食堂"}</h3>
+            <div className="w-[390px] h-[844px] overflow-y-auto pb-40">
+              <div className="bg-[#efefef]">
+                {data.map(({ month, sum, days }, i) => (
+                  <div key={i}>
+                    <div className="h-[60px] flex items-center justify-between px-[18px] border-0 border-y border-solid border-[#e5e5e5]">
+                      <div className="flex items-center">
+                        <span className="text-[#131313] text-base">
+                          {month}
                         </span>
-                        <span className="text-[#1a1a1a] text-base font-medium">
-                          {num}
-                        </span>
+                        <KeyboardArrowDownIcon className="text-[#131313]" />
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-[#b1b1b1] text-[15px] mt-1">
-                          {time}
-                        </span>
-                        {refound ? (
-                          <span className="text-[#ea5d5e] text-sm font-normal">
-                            已全额退款
-                          </span>
-                        ) : originPrice ? (
-                          <span className="text-[#b4b4b4] text-sm line-through font-thin">
-                            {originPrice}
-                          </span>
-                        ) : null}
-                      </div>
+                      <span className="text-[#b9b9b9] text-[15px]">
+                        支出￥
+                        <input
+                          value={sum}
+                          onChange={(e) => {
+                            setData(
+                              data.map((item, ii) =>
+                                ii === i
+                                  ? { ...item, sum: e.target.value }
+                                  : item
+                              )
+                            );
+                          }}
+                        />
+                      </span>
                     </div>
+                    {days.map(
+                      (
+                        {
+                          time,
+                          num,
+                          refound,
+                          originPrice,
+                          shop,
+                          isWeekend,
+                          disable,
+                        },
+                        j
+                      ) => (
+                        <div
+                          key={j}
+                          className={`flex items-stretch h-[85px] pl-[18px] bg-white relative overflow-hidden ${
+                            disable && "bg-[rgba(0,0,0,.5)]"
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            {shop === Shop.Meituan ? (
+                              <img
+                                src="/img/meituan.jpg"
+                                width={52}
+                                height={52}
+                                className="mx-0.5"
+                              />
+                            ) : (
+                              <img
+                                src="/img/qianhai.jpg"
+                                width={52}
+                                height={52}
+                                className="mx-0.5"
+                              />
+                            )}
+                          </div>
+                          <div className="flex-1 flex flex-col justify-center ml-[18px] pr-[18px] border-0 border-b group-last:border-b-0 border-solid border-[#e4e4e4]">
+                            <input
+                              value={num}
+                              onChange={(e) => {
+                                setData(
+                                  data.map((item, ii) =>
+                                    ii === i
+                                      ? {
+                                          ...item,
+                                          days: item.days.map((childItem, jj) =>
+                                            jj === j
+                                              ? {
+                                                  ...childItem,
+                                                  num: e.target.value,
+                                                }
+                                              : childItem
+                                          ),
+                                        }
+                                      : item
+                                  )
+                                );
+                              }}
+                            />
+                            <input
+                              value={time}
+                              onChange={(e) => {
+                                setData(
+                                  data.map((item, ii) =>
+                                    ii === i
+                                      ? { ...item, time: e.target.value }
+                                      : item
+                                  )
+                                );
+                              }}
+                            />
+                            <input
+                              value={originPrice}
+                              placeholder="原价"
+                              onChange={(e) => {
+                                setData(
+                                  data.map((item, ii) =>
+                                    ii === i
+                                      ? {
+                                          ...item,
+                                          days: item.days.map((childItem, jj) =>
+                                            jj === j
+                                              ? {
+                                                  ...childItem,
+                                                  originPrice: e.target.value,
+                                                }
+                                              : childItem
+                                          ),
+                                        }
+                                      : item
+                                  )
+                                );
+                              }}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-y-1 justify-center">
+                            <Button
+                              variant="contained"
+                              size="small"
+                              className="rounded-full"
+                              onClick={() => filterDataItem(i, j)}
+                            >
+                              {disable ? "启用" : "排除"}
+                            </Button>
+                          </div>
+                          <div>
+                            {isWeekend && (
+                              <span className="text-red-500 absolute right-0 top-0 whitespace-nowrap">
+                                周末
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    )}
                   </div>
                 ))}
               </div>
-            ))}
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3>预览</h3>
+          <div className="w-[390px] h-[844px] overflow-y-auto pb-40">
+            <div className="bg-[#efefef]" ref={container}>
+              {filteredData.map(({ month, sum, days }, i) => (
+                <div key={i}>
+                  <div className="h-[60px] flex items-center justify-between px-[18px] border-0 border-y border-solid border-[#e5e5e5]">
+                    <div className="flex items-center">
+                      <span className="text-[#131313] text-base">{month}</span>
+                      <KeyboardArrowDownIcon className="text-[#131313]" />
+                    </div>
+                    <span className="text-[#b9b9b9] text-[15px]">
+                      支出￥{sum}
+                    </span>
+                  </div>
+                  {days.map(({ time, num, refound, originPrice, shop }, i) => (
+                    <div
+                      key={i}
+                      className="flex items-stretch h-[85px] pl-[18px] bg-white group"
+                    >
+                      <div className="flex items-center">
+                        {shop === Shop.Meituan ? (
+                          <img
+                            src="/img/meituan.jpg"
+                            width={52}
+                            height={52}
+                            className="mx-0.5"
+                          />
+                        ) : (
+                          <img
+                            src="/img/qianhai.jpg"
+                            width={52}
+                            height={52}
+                            className="mx-0.5"
+                          />
+                        )}
+                      </div>
+                      <div className="flex-1 flex flex-col justify-center ml-[18px] pr-[18px] border-0 border-b group-last:border-b-0 border-solid border-[#e4e4e4]">
+                        <div className="flex items-center justify-between">
+                          <span className={`text-[#1a1a1a] text-base`}>
+                            {shop === Shop.Meituan
+                              ? "美团平台商户"
+                              : "前海大食堂"}
+                          </span>
+                          <span className="text-[#1a1a1a] text-base font-medium">
+                            {num}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#b1b1b1] text-[15px] mt-1">
+                            {time}
+                          </span>
+                          {refound ? (
+                            <span className="text-[#ea5d5e] text-sm font-normal">
+                              已全额退款
+                            </span>
+                          ) : originPrice ? (
+                            <span className="text-[#b4b4b4] text-sm line-through font-thin">
+                              {originPrice}
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
