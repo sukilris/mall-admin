@@ -14,12 +14,12 @@ type Props = {
 const Login = ({ toSignup }: Props) => {
   const router = useRouter();
   const { register, formState, handleSubmit } = useForm<User.UserLoginReqDto>();
-  const emailField = register("email", { required: true });
+  const emailField = register("email" as any, { required: true });
   const passwordField = register("password", { required: true });
   console.log(formState);
   const loginHandle = handleSubmit(async (data) => {
     console.log(data);
-    const res = await login({});
+    const res = await login({} as any);
     console.log(res);
     // router.replace("/");
   });
@@ -73,7 +73,7 @@ const Login = ({ toSignup }: Props) => {
           SIGN IN
         </Button>
         <div className="py-10 text-center text-[rgb(123,128,154)]">
-          Don't have an account?{" "}
+          Don't have an account?
           <Button
             onClick={toSignup}
             className="px-0 min-w-0 normal-case font-semibold"
