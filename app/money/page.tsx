@@ -286,7 +286,17 @@ const Money = () => {
                                 setData(
                                   data.map((item, ii) =>
                                     ii === i
-                                      ? { ...item, time: e.target.value }
+                                      ? {
+                                          ...item,
+                                          days: item.days.map((childItem, jj) =>
+                                            jj === j
+                                              ? {
+                                                  ...childItem,
+                                                  time: e.target.value,
+                                                }
+                                              : childItem
+                                          ),
+                                        }
                                       : item
                                   )
                                 );
