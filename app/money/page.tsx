@@ -236,8 +236,8 @@ const Money = () => {
                       ) => (
                         <div
                           key={j}
-                          className={`flex items-stretch h-[85px] pl-[18px] bg-white relative overflow-hidden ${
-                            disable && "bg-[rgba(0,0,0,.5)]"
+                          className={`flex items-stretch h-[85px] pl-[18px] relative overflow-hidden ${
+                            disable ? "bg-[rgba(0,0,0,.5)]" : "bg-white"
                           }`}
                         >
                           <div className="flex items-center">
