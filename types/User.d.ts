@@ -1,11 +1,20 @@
-declare namespace User {
-  export type UserLoginReqDto = {
-    captchaId: string;
+export type UserLoginReqDto = {
+  captchaId: string;
 
-    verifyCode: string;
+  verifyCode: string;
 
-    account: string;
+  account: string;
 
-    password: string;
-  };
-}
+  password: string;
+};
+export type UserLoginRespDto = {
+  token: string;
+};
+export type UserLoginCaptchaReqDto = {
+  width?: number;
+  height?: number;
+};
+export type UserLoginCaptchaRespDto = {
+  verifyCode: string;
+  captchaId: string;
+};

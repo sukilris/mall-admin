@@ -1,11 +1,12 @@
 import config from "@/config";
+import { IBaseResponse } from "@/types/api";
 
 const createFullUrl = (url: string) =>
   `${config.origin}${config.apiPrefix}${url}`;
 
-const request = (
+const request = <T>(
   url: string,
-  init?: Omit<RequestInit, "body"> & { body: {} }
+  init?: Omit<RequestInit, "body"> & { body?: any }
 ) => {
   return window
     .fetch(createFullUrl(url), {
@@ -15,7 +16,7 @@ const request = (
       ...init,
       body: JSON.stringify(init?.body),
     })
-    .then((res) => res.json());
+    .then<IBaseResponse<T>>((res) => res.json());
 };
 
 export default request;

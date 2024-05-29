@@ -4,8 +4,10 @@ import GoogleIcon from "@/components/base/svg/GoogleIcon";
 import { Button, IconButton, Switch, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useKeyPress } from "ahooks";
-import { login } from "@/http/user";
+import { login, loginCaptcha } from "http/user";
+import { useEffect, useState } from "react";
+import { UserLoginCaptchaRespDto, UserLoginReqDto } from "@/types/User";
+import Image from "next/image";
 
 type Props = {
   toSignup: () => void;
@@ -13,17 +15,24 @@ type Props = {
 
 const Login = ({ toSignup }: Props) => {
   const router = useRouter();
-  const { register, formState, handleSubmit } = useForm<User.UserLoginReqDto>();
-  const emailField = register("email" as any, { required: true });
+  const [captcha, setCaptcha] = useState<UserLoginCaptchaRespDto>();
+  const { register, formState, handleSubmit } = useForm<UserLoginReqDto>();
+  const accountField = register("account", { required: true });
   const passwordField = register("password", { required: true });
-  console.log(formState);
+  const verifyCodeField = register("verifyCode", { required: true });
   const loginHandle = handleSubmit(async (data) => {
-    console.log(data);
-    const res = await login({} as any);
-    console.log(res);
+    const res = await login({ ...data, captchaId: captcha!.captchaId });
+    console.log(res.data?.token);
     // router.replace("/");
   });
-  useKeyPress("enter", () => loginHandle());
+  const getLoginCaptcha = () => {
+    loginCaptcha().then((res) => {
+      setCaptcha(res.data);
+    });
+  };
+  useEffect(() => {
+    getLoginCaptcha();
+  }, []);
   return (
     <div>
       <div className="px-4">
@@ -42,22 +51,43 @@ const Login = ({ toSignup }: Props) => {
           </div>
         </div>
       </div>
-      <div className="mt-8 px-6">
+      <form onSubmit={loginHandle} className="mt-8 px-6">
         <TextField
-          label="Email"
+          label="Account"
           variant="standard"
           fullWidth
           size="small"
-          {...emailField}
+          {...accountField}
         />
         <TextField
-          label="password"
+          label="Password"
           variant="standard"
           fullWidth
           size="small"
           className="mt-4"
+          type="password"
           {...passwordField}
         />
+        <div className="flex items-center">
+          <TextField
+            label="Captcha"
+            variant="standard"
+            fullWidth
+            size="small"
+            className="mt-4"
+            {...verifyCodeField}
+          />
+          {captcha?.verifyCode && (
+            <Image
+              className="cursor-pointer"
+              onClick={getLoginCaptcha}
+              src={captcha.verifyCode}
+              width={200}
+              height={80}
+              alt=""
+            />
+          )}
+        </div>
         <div className="h-10 mt-6 mb-8">
           <label className="cursor-pointer">
             <Switch />
@@ -66,8 +96,8 @@ const Login = ({ toSignup }: Props) => {
         </div>
         <Button
           fullWidth
+          type="submit"
           variant="contained"
-          onClick={loginHandle}
           className="h-10 rounded-lg bg-[linear-gradient(195deg,rgb(73,163,241),rgb(26,115,232))]"
         >
           SIGN IN
@@ -81,7 +111,7 @@ const Login = ({ toSignup }: Props) => {
             Sign up
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };
