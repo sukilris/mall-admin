@@ -4,8 +4,10 @@ import GoogleIcon from "@/components/base/svg/GoogleIcon";
 import { Button, IconButton, Switch, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useKeyPress } from "ahooks";
-import { login } from "@/http/user";
+import { register as signup, registerCaptcha } from "@/http/user";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { ScaleLoader } from "react-spinners";
 
 type Props = {
   toLogin: () => void;
@@ -13,17 +15,28 @@ type Props = {
 
 const Signup = ({ toLogin }: Props) => {
   const router = useRouter();
-  const { register, formState, handleSubmit } = useForm<User.UserLoginReqDto>();
-  const emailField = register("email" as any, { required: true });
+  const [captcha, setCaptcha] = useState<User.UserRegisterCaptchaRespDto>();
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const { register, formState, handleSubmit } =
+    useForm<User.UserRegisterReqDto>();
+  const accountField = register("account", { required: true });
   const passwordField = register("password", { required: true });
-  console.log(formState);
-  const loginHandle = handleSubmit(async (data) => {
-    console.log(data);
-    const res = await login({} as any);
-    console.log(res);
+  const verifyCodeField = register("verifyCode", { required: true });
+  const registerHandle = handleSubmit(async (data) => {
+    setRegisterLoading(true);
+    const res = await signup({ ...data, captchaId: captcha!.captchaId });
+    setRegisterLoading(false);
+    console.log(res.data?.token);
     // router.replace("/");
   });
-  useKeyPress("enter", () => loginHandle());
+  const getRegisterCaptcha = () => {
+    registerCaptcha().then((res) => {
+      setCaptcha(res.data);
+    });
+  };
+  useEffect(() => {
+    getRegisterCaptcha();
+  }, []);
   return (
     <div>
       <div className="px-4">
@@ -44,22 +57,45 @@ const Signup = ({ toLogin }: Props) => {
           </div>
         </div>
       </div>
-      <div className="mt-8 px-6">
+      <form onSubmit={registerHandle} className="mt-8 px-6">
         <TextField
-          label="Email"
+          label="Account"
           variant="standard"
           fullWidth
           size="small"
-          {...emailField}
+          {...accountField}
         />
         <TextField
-          label="password"
+          label="Password"
           variant="standard"
           fullWidth
           size="small"
           className="mt-4"
+          type="password"
           {...passwordField}
         />
+        <div className="flex items-center">
+          <TextField
+            label="Captcha"
+            variant="standard"
+            fullWidth
+            size="small"
+            className="mt-4"
+            {...verifyCodeField}
+          />
+          <div className="w-[200px] h-[60px]">
+            {captcha?.verifyCode && (
+              <Image
+                className="cursor-pointer w-full h-full"
+                onClick={getRegisterCaptcha}
+                src={captcha.verifyCode}
+                width={0}
+                height={0}
+                alt=""
+              />
+            )}
+          </div>
+        </div>
         <div className="h-10 mt-6 mb-8">
           <label className="cursor-pointer">
             <Switch />
@@ -68,11 +104,21 @@ const Signup = ({ toLogin }: Props) => {
         </div>
         <Button
           fullWidth
+          disabled={registerLoading}
+          type="submit"
           variant="contained"
-          onClick={loginHandle}
           className="h-10 rounded-lg bg-[linear-gradient(195deg,rgb(73,163,241),rgb(26,115,232))]"
         >
-          SIGN IN
+          {registerLoading ? (
+            <ScaleLoader
+              className="mr-4 text-white"
+              color="white"
+              width={4}
+              height={24}
+            />
+          ) : (
+            "Sign up"
+          )}
         </Button>
         <div className="py-10 text-center text-[rgb(123,128,154)]">
           Already have an account?{" "}
@@ -80,10 +126,10 @@ const Signup = ({ toLogin }: Props) => {
             onClick={toLogin}
             className="px-0 min-w-0 normal-case font-semibold"
           >
-            Sign up
+            Sign in
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

@@ -45,7 +45,7 @@ const AuthPage = () => {
             before:bg-[linear-gradient(195deg,rgba(66,66,74,0.6),rgba(25,25,25,0.6))]
             flex items-center justify-center"
     >
-      <div className="lg:w-[25%] pt-6 overflow-hidden">
+      <div className="lg:w-[25%] pt-6 overflow-hidden relative">
         <div ref={parentRef} className="bg-white rounded-xl z-10">
           {authType === AuthType.Login ? (
             <Login toSignup={() => setAuthType(AuthType.Signup)} />

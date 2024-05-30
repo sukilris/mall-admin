@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { login, loginCaptcha } from "http/user";
 import { useEffect, useState } from "react";
-import { UserLoginCaptchaRespDto, UserLoginReqDto } from "@/types/User";
 import Image from "next/image";
+import { ClockLoader, PacmanLoader, ScaleLoader } from "react-spinners";
 
 type Props = {
   toSignup: () => void;
@@ -15,13 +15,16 @@ type Props = {
 
 const Login = ({ toSignup }: Props) => {
   const router = useRouter();
-  const [captcha, setCaptcha] = useState<UserLoginCaptchaRespDto>();
-  const { register, formState, handleSubmit } = useForm<UserLoginReqDto>();
+  const [captcha, setCaptcha] = useState<User.UserLoginCaptchaRespDto>();
+  const [loginLoading, setLoginLoading] = useState(false);
+  const { register, formState, handleSubmit } = useForm<User.UserLoginReqDto>();
   const accountField = register("account", { required: true });
   const passwordField = register("password", { required: true });
   const verifyCodeField = register("verifyCode", { required: true });
   const loginHandle = handleSubmit(async (data) => {
+    setLoginLoading(true);
     const res = await login({ ...data, captchaId: captcha!.captchaId });
+    setLoginLoading(false);
     console.log(res.data?.token);
     // router.replace("/");
   });
@@ -77,16 +80,18 @@ const Login = ({ toSignup }: Props) => {
             className="mt-4"
             {...verifyCodeField}
           />
-          {captcha?.verifyCode && (
-            <Image
-              className="cursor-pointer"
-              onClick={getLoginCaptcha}
-              src={captcha.verifyCode}
-              width={200}
-              height={80}
-              alt=""
-            />
-          )}
+          <div className="w-[200px] h-[60px]">
+            {captcha?.verifyCode && (
+              <Image
+                className="cursor-pointer w-full h-full"
+                onClick={getLoginCaptcha}
+                src={captcha.verifyCode}
+                width={0}
+                height={0}
+                alt=""
+              />
+            )}
+          </div>
         </div>
         <div className="h-10 mt-6 mb-8">
           <label className="cursor-pointer">
@@ -96,11 +101,21 @@ const Login = ({ toSignup }: Props) => {
         </div>
         <Button
           fullWidth
+          disabled={loginLoading}
           type="submit"
           variant="contained"
           className="h-10 rounded-lg bg-[linear-gradient(195deg,rgb(73,163,241),rgb(26,115,232))]"
         >
-          SIGN IN
+          {loginLoading ? (
+            <ScaleLoader
+              className="mr-4 text-white"
+              color="white"
+              width={4}
+              height={24}
+            />
+          ) : (
+            "Sign in"
+          )}
         </Button>
         <div className="py-10 text-center text-[rgb(123,128,154)]">
           {"Don't have an account?"}{" "}
