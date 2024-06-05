@@ -8,6 +8,8 @@ import { login, loginCaptcha } from "http/user";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ClockLoader, PacmanLoader, ScaleLoader } from "react-spinners";
+import { useUserStore } from "@/store/useUserStore";
+import { useShallow } from "zustand/react/shallow";
 
 type Props = {
   toSignup: () => void;
@@ -15,6 +17,9 @@ type Props = {
 
 const Login = ({ toSignup }: Props) => {
   const router = useRouter();
+  const { initUserInfo } = useUserStore(
+    useShallow(({ initUserInfo }) => ({ initUserInfo }))
+  );
   const [captcha, setCaptcha] = useState<User.UserLoginCaptchaRespDto>();
   const [loginLoading, setLoginLoading] = useState(false);
   const { register, formState, handleSubmit } = useForm<User.UserLoginReqDto>();
@@ -25,7 +30,7 @@ const Login = ({ toSignup }: Props) => {
     setLoginLoading(true);
     const res = await login({ ...data, captchaId: captcha!.captchaId });
     setLoginLoading(false);
-    console.log(res.data?.token);
+    initUserInfo(res.data!.token);
     // router.replace("/");
   });
   const getLoginCaptcha = () => {

@@ -38,3 +38,13 @@ export const registerCaptcha = (
     }
   );
 };
+export const getUserPermmenu = () => {
+  return request<User.UserPermMenuRespDto>("/user/register", {
+    method: "GET",
+  });
+};
+export const getProfileInfo = () => {
+  return request<User.UserProfileInfoRespDto>("/user/profile/info", {
+    method: "GET",
+  });
+};

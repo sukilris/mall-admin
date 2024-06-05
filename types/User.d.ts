@@ -39,4 +39,17 @@ declare namespace User {
     verifyCode: string;
     captchaId: string;
   };
+  export type UserProfileInfoRespDto = {
+    avatar: string;
+    email: string;
+    gender: number;
+    mobile: string;
+    nickname: string;
+    remark: string;
+    username: string;
+  };
+  export type UserPermMenuRespDto = {
+    menus: UserPermRespItemDto[];
+    perms: string[];
+  };
 }
