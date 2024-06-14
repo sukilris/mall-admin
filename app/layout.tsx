@@ -9,6 +9,7 @@ import Copyright from "./_components/Copyright";
 import { usePathname } from "next/navigation";
 import useRandomSelectionColor from "@/hooks/useRandomSelectionColor";
 import { SnackbarProvider } from "notistack";
+import { useInit } from "@/hooks/useInit";
 
 type LayoutContext = {
   sideBarOpen: boolean;
@@ -42,6 +43,7 @@ export default function RootLayout({
     [sideBarOpen]
   );
   useRandomSelectionColor();
+  useInit();
   const renderChildren = () => {
     if (excludePath.includes(pathname)) {
       return children;

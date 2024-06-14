@@ -48,6 +48,18 @@ declare namespace User {
     remark: string;
     username: string;
   };
+  export type UserPermRespItemDto = {
+    activeRouter: string;
+    icon: string;
+    id: number;
+    isShow: number;
+    name: string;
+    orderNum: number;
+    parentId: number;
+    router: string;
+    type: number;
+    viewPath: string;
+  };
   export type UserPermMenuRespDto = {
     menus: UserPermRespItemDto[];
     perms: string[];

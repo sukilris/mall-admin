@@ -1,8 +1,8 @@
 import config from "@/config";
 import { IBaseResponse } from "@/types/api";
 import { getToken } from "./storage";
-import { enqueueSnackbar } from "notistack";
 import { Alert } from "@mui/material";
+import { error } from "./alert";
 
 const createFullUrl = (url: string) =>
   `${config.origin}${config.apiPrefix}${url}`;
@@ -26,27 +26,14 @@ function request<T>(
     })
     .then(async (res) => {
       const result: IBaseResponse<T> = await res.json();
-      console.log(result);
       if (result.code !== 200) {
-        enqueueSnackbar({
-          content: (
-            <Alert variant="filled" severity="error">
-              This is a filled error Alert.
-            </Alert>
-          ),
-        });
+        error(result.msg);
       }
       return result;
     })
     .catch((reason) => {
       console.log(reason);
-      enqueueSnackbar({
-        content: (
-          <Alert variant="filled" severity="error">
-            This is a filled error Alert.
-          </Alert>
-        ),
-      });
+      return Promise.reject(reason);
     });
 }
 

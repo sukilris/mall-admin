@@ -39,7 +39,7 @@ export const registerCaptcha = (
   );
 };
 export const getUserPermmenu = () => {
-  return request<User.UserPermMenuRespDto>("/user/register", {
+  return request<User.UserPermMenuRespDto>("/user/permmenu", {
     method: "GET",
   });
 };
