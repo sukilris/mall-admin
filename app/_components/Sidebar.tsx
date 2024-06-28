@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 // import Button from "@mui/material-next/Button";
 import Link from "next/link";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, useContext, useMemo, useState } from "react";
 import ApiRoundedIcon from "@mui/icons-material/ApiRounded";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
@@ -19,6 +19,8 @@ import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
 import TocRoundedIcon from "@mui/icons-material/TocRounded";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import { useUserStore } from "@/store/useUserStore";
+import { useShallow } from "zustand/react/shallow";
 
 const menus = [
   {
@@ -109,8 +111,34 @@ type Props = {
   toggleSideBar: () => void;
 };
 
+type Menu = User.UserPermRespItemDto & {
+  children?: User.UserPermRespItemDto[];
+};
+
 const Sidebar = ({ open, toggleSideBar }: Props) => {
-  const [] = useState(0);
+  const { permmenu } = useUserStore(
+    useShallow(({ permmenu }) => ({ permmenu }))
+  );
+  const menuTree = useMemo(() => {
+    const menuMap = permmenu?.menus.reduce<Record<string, Menu>>(
+      (map, menu) => ((map[menu.id] = { ...menu }), map),
+      {}
+    );
+    const menuTree: Menu[] = [];
+    permmenu?.menus.forEach((menu) => {
+      const parent = menuMap?.[menu.parentId];
+      const self = menuMap?.[menu.id]!;
+      if (parent) {
+        if (!parent.children) {
+          parent.children = [];
+        }
+        parent.children.push(self);
+      } else {
+        menuTree.push(self);
+      }
+    });
+    return menuTree;
+  }, [permmenu?.menus]);
 
   const renderCollapse = (children: ReactNode) => {
     return (
@@ -124,7 +152,7 @@ const Sidebar = ({ open, toggleSideBar }: Props) => {
     );
   };
   const renderMenu = () => {
-    return menus.map(({ children, name, path, Icon }, index) => {
+    return menuTree?.map(({ children, name, router, icon }, index) => {
       if (children) {
         return (
           <Accordion
@@ -137,7 +165,7 @@ const Sidebar = ({ open, toggleSideBar }: Props) => {
                 className="text-gray-50 h-[52px] hover:bg-[rgba(255,255,255,0.2)] transition-colors transition-default rounded-md my-0.5"
               >
                 <span className="w-9 flex justify-center items-center">
-                  <Icon />
+                  {/* <Icon /> */}
                 </span>
                 {renderCollapse(
                   <div className="flex items-center justify-between w-full">
@@ -150,14 +178,14 @@ const Sidebar = ({ open, toggleSideBar }: Props) => {
               </ListItemButton>
             </AccordionSummary>
             <AccordionDetails className="py-0">
-              {children.map(({ name, path, Icon }) => (
-                <Link href={path} key={path} className="no-underline">
+              {children.map(({ name, router, icon }) => (
+                <Link href={router} key={router} className="no-underline">
                   <ListItemButton
                     component="div"
                     className="text-gray-50 h-12 hover:bg-[rgba(255,255,255,0.2)] transition-colors transition-default rounded-md my-0.5"
                   >
                     <span className="w-9 flex justify-center items-center">
-                      <Icon />
+                      {/* <Icon /> */}
                     </span>
                     {renderCollapse(name)}
                   </ListItemButton>
@@ -168,13 +196,13 @@ const Sidebar = ({ open, toggleSideBar }: Props) => {
         );
       }
       return (
-        <Link href={path} className="px-4 no-underline" key={index}>
+        <Link href={router} className="px-4 no-underline" key={index}>
           <ListItemButton
             component="div"
             className="text-gray-50 h-[52px] hover:bg-[rgba(255,255,255,0.2)] transition-colors transition-default rounded-md my-0.5"
           >
             <span className="w-9 flex justify-center items-center">
-              <Icon />
+              {/* <Icon /> */}
             </span>
             {renderCollapse(name)}
           </ListItemButton>
