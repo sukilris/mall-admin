@@ -89,7 +89,7 @@ const Money = () => {
         time: dayjs(
           current.hour(17).minute(30).second(0).millisecond(0).valueOf() +
             Math.trunc(Math.random() * 2580000)
-        ).format(`MM月DD日 HH:mm`),
+        ).format(`M月DD日 HH:mm`),
         num: String((-(33 + Math.random() * 5)).toFixed(2)),
         isWeekend: current.day() === 0 || current.day() === 6,
       });
@@ -102,7 +102,7 @@ const Money = () => {
             .second(0)
             .millisecond(0)
             .valueOf() + Math.trunc(Math.random() * 2580000)
-        ).format(`MM月DD日 HH:mm`),
+        ).format(`M月DD日 HH:mm`),
         num: String((-(33 + Math.random() * 5)).toFixed(2)),
         isWeekend: current.day() === 0 || current.day() === 6,
       });
