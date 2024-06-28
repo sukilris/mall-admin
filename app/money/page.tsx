@@ -193,7 +193,7 @@ const Money = () => {
         </div>
         <div>
           <div>
-            <h3>编辑: {shop === Shop.Meituan ? "美团" : "前海大食堂"}</h3>
+            <h3>编辑: {shop === Shop.Meituan ? "美团" : "梦北美食荟"}</h3>
             <div className="w-[390px] h-[844px] overflow-y-auto pb-40">
               <div className="bg-[#efefef]">
                 {data.map(({ month, sum, days }, i) => (
@@ -394,7 +394,7 @@ const Money = () => {
                           <span className={`text-[#1a1a1a] text-base`}>
                             {shop === Shop.Meituan
                               ? "美团平台商户"
-                              : "前海大食堂"}
+                              : "梦北美食荟"}
                           </span>
                           <span className="text-[#1a1a1a] text-base font-medium">
                             {num}
