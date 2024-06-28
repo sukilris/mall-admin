@@ -97,8 +97,8 @@ const Money = () => {
         shop,
         time: dayjs(
           current
-            .hour(11)
-            .minute(shop === Shop.Meituan ? 20 : 30)
+            .hour(shop === Shop.Meituan ? 11 : 12)
+            .minute(shop === Shop.Meituan ? 20 : 0)
             .second(0)
             .millisecond(0)
             .valueOf() + Math.trunc(Math.random() * 2580000)
