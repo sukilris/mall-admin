@@ -4,7 +4,7 @@ import GoogleIcon from "@/components/base/svg/GoogleIcon";
 import { Button, IconButton, Switch, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { register as signup, registerCaptcha } from "@/http/user";
+import { register as signup, registerCaptcha } from "@/services/user";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ScaleLoader } from "react-spinners";

@@ -4,7 +4,7 @@ import GoogleIcon from "@/components/base/svg/GoogleIcon";
 import { Button, IconButton, Switch, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { login, loginCaptcha } from "http/user";
+import { login, loginCaptcha } from "@/services/user";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ClockLoader, PacmanLoader, ScaleLoader } from "react-spinners";
@@ -31,7 +31,7 @@ const Login = ({ toSignup }: Props) => {
     const res = await login({ ...data, captchaId: captcha!.captchaId });
     setLoginLoading(false);
     initUserInfo(res.data!.token);
-    // router.replace("/");
+    router.replace("/");
   });
   const getLoginCaptcha = () => {
     loginCaptcha().then((res) => {

@@ -1,4 +1,4 @@
-import request from "@/helper/request";
+import request from "@/utils/request";
 
 export const login = (userLoginReqDto: User.UserLoginReqDto) => {
   return request<User.UserLoginRespDto>("/user/login", {

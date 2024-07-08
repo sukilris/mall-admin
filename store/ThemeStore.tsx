@@ -5,9 +5,9 @@ import {
   StyledEngineProvider,
 } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import defaultTheme, { getDesignTokens } from "@/helper/theme";
+import defaultTheme, { getDesignTokens } from "@/utils/theme";
 import { useIsomorphicLayoutEffect } from "ahooks";
-import NextAppDirEmotionCacheProvider from "@/helper/EmotionCache";
+import NextAppDirEmotionCacheProvider from "@/utils/EmotionCache";
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},

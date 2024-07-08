@@ -26,8 +26,12 @@ function request<T>(
     })
     .then(async (res) => {
       const result: IBaseResponse<T> = await res.json();
+      console.log(result);
       if (result.code !== 200) {
         error(result.msg);
+      }
+      if (result.code === 401 && window.location.pathname !== "/login") {
+        window.location.href = "/login";
       }
       return result;
     })

@@ -1,5 +1,5 @@
-import { getToken, setToken } from "@/helper/storage";
-import { getProfileInfo, getUserPermmenu } from "@/http/user";
+import { getToken, setToken } from "@/utils/storage";
+import { getProfileInfo, getUserPermmenu } from "@/services/user";
 import { create } from "zustand";
 
 type State = {
