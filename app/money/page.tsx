@@ -89,7 +89,7 @@ const Money = () => {
         time: dayjs(
           current.hour(17).minute(30).second(0).millisecond(0).valueOf() +
             Math.trunc(Math.random() * 2580000)
-        ).format(`MM月DD日 HH:mm`),
+        ).format(`M月DD日 HH:mm`),
         num: String((-(33 + Math.random() * 5)).toFixed(2)),
         isWeekend: current.day() === 0 || current.day() === 6,
       });
@@ -97,12 +97,12 @@ const Money = () => {
         shop,
         time: dayjs(
           current
-            .hour(11)
-            .minute(shop === Shop.Meituan ? 20 : 30)
+            .hour(shop === Shop.Meituan ? 11 : 12)
+            .minute(shop === Shop.Meituan ? 20 : 0)
             .second(0)
             .millisecond(0)
             .valueOf() + Math.trunc(Math.random() * 2580000)
-        ).format(`MM月DD日 HH:mm`),
+        ).format(`M月DD日 HH:mm`),
         num: String((-(33 + Math.random() * 5)).toFixed(2)),
         isWeekend: current.day() === 0 || current.day() === 6,
       });
@@ -193,7 +193,7 @@ const Money = () => {
         </div>
         <div>
           <div>
-            <h3>编辑: {shop === Shop.Meituan ? "美团" : "前海大食堂"}</h3>
+            <h3>编辑: {shop === Shop.Meituan ? "美团" : "梦北美食荟"}</h3>
             <div className="w-[390px] h-[844px] overflow-y-auto pb-40">
               <div className="bg-[#efefef]">
                 {data.map(({ month, sum, days }, i) => (
@@ -394,7 +394,7 @@ const Money = () => {
                           <span className={`text-[#1a1a1a] text-base`}>
                             {shop === Shop.Meituan
                               ? "美团平台商户"
-                              : "前海大食堂"}
+                              : "梦北美食荟"}
                           </span>
                           <span className="text-[#1a1a1a] text-base font-medium">
                             {num}
