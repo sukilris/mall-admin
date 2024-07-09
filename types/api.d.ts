@@ -17,3 +17,10 @@ export interface IPaginationInfo {
 export interface IPaginationRespData<T = any> extends IListRespData<T> {
   pagination: IPaginationInfo;
 }
+export type WithoutPaginationResp<T> = IBaseResponse<IListRespData<T>>;
+
+export type WithPaginationResp<T> = IBaseResponse<IPaginationRespData<T>>;
+
+export type ProTableResponse<T> =
+  | WithPaginationResp<T>
+  | WithoutPaginationResp<T>;

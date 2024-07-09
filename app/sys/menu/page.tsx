@@ -2,6 +2,7 @@
 
 import ProTable, { column } from "@/components/base/ProTable";
 import { getPermmenuList } from "@/services/permmenu";
+import { SysPermMenuItemRespDto } from "@/types/sys";
 
 type Data = {
   id: string;
@@ -13,7 +14,7 @@ type Data = {
   salary: string;
 };
 
-const columns: column<Data>[] = [
+const columns: column<SysPermMenuItemRespDto>[] = [
   {
     title: "NAME",
     field: "name",
@@ -39,105 +40,14 @@ const columns: column<Data>[] = [
     field: "salary",
   },
 ];
-const list = [
-  {
-    id: "1",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-  {
-    id: "2",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-  {
-    id: "3",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-  {
-    id: "4",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-  {
-    id: "5",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-  {
-    id: "6",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-  {
-    id: "7",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-  {
-    id: "8",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-  {
-    id: "9",
-    name: "test",
-    position: "test",
-    office: "test",
-    age: "test",
-    startDate: "test",
-    salary: "test",
-  },
-];
 export default function Home() {
   const request = () => {
     return getPermmenuList();
   };
   return (
     <div className="mt-12 mb-6">
-      <ProTable<Data>
+      <ProTable<SysPermMenuItemRespDto>
         className="mb-6"
-        title="Datatable Simple"
-        description="A lightweight, extendable, dependency-free javascript HTML table plugin."
-        filters={[1, 1, 1, 1, 1, 1, 1, 1]}
-        columns={columns}
-        request={request}
-        rowKey="id"
-      />
-      <ProTable<Data>
         title="Datatable Simple"
         description="A lightweight, extendable, dependency-free javascript HTML table plugin."
         filters={[1, 1, 1, 1, 1, 1, 1, 1]}

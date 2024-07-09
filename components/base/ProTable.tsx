@@ -17,17 +17,12 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useAsyncEffect } from "ahooks";
+import { ProTableResponse } from "@/types/api";
 
 export type Filter = {};
 export type column<T> = {
   title?: ReactNode;
   field: keyof T;
-};
-type ListResult<T> = {
-  page: number;
-  size: number;
-  total: number;
-  list: T[];
 };
 type Props<T, U> = {
   className?: string;
@@ -36,7 +31,7 @@ type Props<T, U> = {
   renderTitle?: () => ReactNode;
   filters?: Filter[];
   columns: column<T>[];
-  request: (params?: U) => Promise<ListResult<T>>;
+  request: (params?: U) => Promise<ProTableResponse<T>>;
   rowKey?: keyof T;
 };
 type TableHandle = {
@@ -68,7 +63,7 @@ function ProTable<T extends {} = {}, U extends {} = {}>(
   }));
   useAsyncEffect(async () => {
     const res = await request();
-    setList(res.list);
+    setList(res.data?.list || []);
   }, []);
   return (
     <div className={`shadow rounded-xl bg-white ${className}`}>
