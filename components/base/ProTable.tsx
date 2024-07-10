@@ -17,7 +17,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useAsyncEffect } from "ahooks";
-import { ProTableResponse } from "@/types/api";
+import { ListResponse } from "@/types/api";
 
 export type Filter = {};
 export type column<T> = {
@@ -31,7 +31,7 @@ type Props<T, U> = {
   renderTitle?: () => ReactNode;
   filters?: Filter[];
   columns: column<T>[];
-  request: (params?: U) => Promise<ProTableResponse<T>>;
+  request: (params?: U) => Promise<ListResponse<T>>;
   rowKey?: keyof T;
 };
 type TableHandle = {

@@ -1,5 +1,5 @@
 import config from "@/config";
-import { IBaseResponse } from "@/types/api";
+import { BaseResponse } from "@/types/api";
 import { getToken } from "./storage";
 import { Alert } from "@mui/material";
 import { error } from "./alert";
@@ -7,7 +7,7 @@ import { error } from "./alert";
 const createFullUrl = (url: string) =>
   `${config.origin}${config.apiPrefix}${url}`;
 
-function request<T>(
+function request<T extends BaseResponse>(
   url: string,
   init?: Omit<RequestInit, "body"> & { body?: any }
 ) {
@@ -25,7 +25,7 @@ function request<T>(
       body: JSON.stringify(init?.body),
     })
     .then(async (res) => {
-      const result: IBaseResponse<T> = await res.json();
+      const result = (await res.json()) as T;
       if (result.code !== 200) {
         error(result.msg);
       }

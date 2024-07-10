@@ -4,40 +4,10 @@ import ProTable, { column } from "@/components/base/ProTable";
 import { getPermmenuList } from "@/services/permmenu";
 import { SysPermMenuItemRespDto } from "@/types/sys";
 
-type Data = {
-  id: string;
-  name: string;
-  position: string;
-  office: string;
-  age: string;
-  startDate: string;
-  salary: string;
-};
-
 const columns: column<SysPermMenuItemRespDto>[] = [
   {
     title: "NAME",
     field: "name",
-  },
-  {
-    title: "POSITION",
-    field: "position",
-  },
-  {
-    title: "OFFICE",
-    field: "office",
-  },
-  {
-    title: "AGE",
-    field: "age",
-  },
-  {
-    title: "START DATE",
-    field: "startDate",
-  },
-  {
-    title: "SALARY",
-    field: "salary",
   },
 ];
 export default function Home() {
